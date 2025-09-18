@@ -1,37 +1,68 @@
-<script>
-  let qrScanner;
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <title>QR読取サンプル</title>
+  <script src="https://unpkg.com/html5-qrcode"></script>
+  <style>
+    #reader { width: 300px; margin: 10px auto; }
+    #result { margin-top: 20px; text-align: center; }
+    button { padding: 10px 20px; margin: 5px; }
+    #closeBtn { display: none; } /* 初期は非表示 */
+  </style>
+</head>
+<body>
+  <div style="text-align:center;">
+    <button onclick="startScan()">読取</button>
+    <button id="closeBtn" onclick="stopScan()">閉じる</button>
+    <div id="reader"></div>
+    <div id="result"></div>
+  </div>
 
-  function startScan() {
-    if (!qrScanner) {
+  <script>
+    let qrScanner;
+
+    function startScan() {
+      if (qrScanner) {
+        qrScanner.clear().catch(() => {});
+      }
       qrScanner = new Html5Qrcode("reader");
-    } else {
-      // 既存のスキャナを一度クリア
-      qrScanner.clear().catch(() => {});
-      qrScanner = new Html5Qrcode("reader");
+
+      qrScanner.start(
+        { facingMode: "environment" }, // 背面カメラ
+        { fps: 10, qrbox: 250 },
+        onScanSuccess
+      );
+
+      document.getElementById("closeBtn").style.display = "inline-block"; // 閉じるボタン表示
     }
 
-    qrScanner.start(
-      { facingMode: "environment" },
-      { fps: 10, qrbox: 250 },
-      onScanSuccess
-    );
-  }
+    function stopScan() {
+      if (qrScanner) {
+        qrScanner.stop().then(() => {
+          document.getElementById("reader").innerHTML = "";
+          document.getElementById("closeBtn").style.display = "none";
+        });
+      }
+    }
 
-  function onScanSuccess(decodedText) {
-    qrScanner.stop().then(() => {
+    function onScanSuccess(decodedText) {
+      stopScan(); // 読取成功時に停止＆閉じるボタンも消える
       showResult(decodedText);
-    });
-  }
-
-  function showResult(url) {
-    const result = document.getElementById("result");
-    result.innerHTML = "";
-    if (url.match(/\.(wav)$/i)) {
-      result.innerHTML = `<audio controls autoplay src="${url}"></audio>`;
-    } else if (url.match(/\.(jpg|png)$/i)) {
-      result.innerHTML = `<img src="${url}" style="max-width:90%;">`;
-    } else {
-      result.innerHTML = `<a href="${url}" target="_blank">${url}</a>`;
     }
-  }
-</script>
+
+    function showResult(url) {
+      const result = document.getElementById("result");
+      result.innerHTML = "";
+      if (url.match(/\.wav$/i)) {
+        // 裏で自動再生（UIなし）
+        result.innerHTML = `<audio autoplay src="${url}"></audio>`;
+      } else if (url.match(/\.(jpg|png)$/i)) {
+        result.innerHTML = `<img src="${url}" style="max-width:90%;">`;
+      } else {
+        result.innerHTML = `<a href="${url}" target="_blank">${url}</a>`;
+      }
+    }
+  </script>
+</body>
+</html>
