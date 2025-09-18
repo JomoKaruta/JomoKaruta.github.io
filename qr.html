@@ -2,40 +2,75 @@
 <html lang="ja">
 <head>
   <meta charset="UTF-8">
-  <title>QR読取サンプル</title>
+  <title>QR読取サンプル（UI改善版）</title>
   <script src="https://unpkg.com/html5-qrcode"></script>
   <style>
-    #reader { width: 300px; margin: 10px auto; }
-    #result { margin-top: 20px; text-align: center; }
-    button { padding: 10px 20px; margin: 5px; }
-    #closeBtn { display: none; }
+    body {
+      font-family: "Segoe UI", sans-serif;
+      background: #f0f4f8;
+      text-align: center;
+      padding-top: 50px;
+    }
+
+    #reader { width: 300px; margin: 20px auto; }
+
+    #result { margin-top: 30px; text-align: center; font-size: 18px; }
+
+    /* ボタン共通スタイル */
+    button {
+      font-size: 20px;           /* 文字サイズ大きめ */
+      padding: 20px 40px;        /* 高さ・幅を大きめ */
+      margin: 10px;
+      border: none;
+      border-radius: 12px;
+      cursor: pointer;
+      transition: all 0.2s;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.2);
+      color: #fff;
+    }
+
+    /* 読取ボタン */
+    #startBtn {
+      background: linear-gradient(45deg,#4CAF50,#2E7D32);
+    }
+    #startBtn:hover {
+      background: linear-gradient(45deg,#66BB6A,#388E3C);
+      transform: translateY(-2px);
+    }
+
+    /* 閉じるボタン */
+    #closeBtn {
+      background: linear-gradient(45deg,#F44336,#C62828);
+      display: none; /* 初期非表示 */
+    }
+    #closeBtn:hover {
+      background: linear-gradient(45deg,#EF5350,#B71C1C);
+      transform: translateY(-2px);
+    }
+
+    img { max-width: 90%; border-radius: 8px; margin-top: 10px; }
   </style>
 </head>
 <body>
-  <div style="text-align:center;">
-    <button onclick="startScan()">読取</button>
-    <button id="closeBtn" onclick="stopScan()">閉じる</button>
-    <div id="reader"></div>
-    <div id="result"></div>
-  </div>
+  <button id="startBtn" onclick="startScan()">QRを読み取る</button>
+  <button id="closeBtn" onclick="stopScan()">閉じる</button>
+
+  <div id="reader"></div>
+  <div id="result"></div>
 
   <script>
     let qrScanner = null;
 
     async function startScan() {
-      // 既存のスキャナがあれば停止＆削除
       if (qrScanner) {
         try {
           await qrScanner.stop();
           await qrScanner.clear();
-        } catch(e) {
-          console.warn("停止処理中にエラー", e);
-        }
+        } catch(e){ console.warn(e); }
         qrScanner = null;
         document.getElementById("reader").innerHTML = "";
       }
 
-      // 新しいインスタンスを作る
       qrScanner = new Html5Qrcode("reader");
 
       qrScanner.start(
@@ -52,9 +87,7 @@
         try {
           await qrScanner.stop();
           await qrScanner.clear();
-        } catch(e) {
-          console.warn("停止処理中にエラー", e);
-        }
+        } catch(e){ console.warn(e); }
         document.getElementById("reader").innerHTML = "";
         document.getElementById("closeBtn").style.display = "none";
         qrScanner = null;
@@ -72,7 +105,7 @@
       if (url.match(/\.wav$/i)) {
         result.innerHTML = `<audio autoplay src="${url}"></audio>`;
       } else if (url.match(/\.(jpg|png)$/i)) {
-        result.innerHTML = `<img src="${url}" style="max-width:90%;">`;
+        result.innerHTML = `<img src="${url}">`;
       } else {
         result.innerHTML = `<a href="${url}" target="_blank">${url}</a>`;
       }
