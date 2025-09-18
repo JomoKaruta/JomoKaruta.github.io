@@ -2,7 +2,7 @@
 <html lang="ja">
 <head>
   <meta charset="UTF-8">
-  <title>QR“ÇæƒTƒ“ƒvƒ‹</title>
+  <title>QRèª­å–ã‚µãƒ³ãƒ—ãƒ«</title>
   <script src="https://unpkg.com/html5-qrcode"></script>
   <style>
     #reader { width: 300px; margin: 10px auto; }
@@ -12,7 +12,7 @@
 </head>
 <body>
   <div style="text-align:center;">
-    <button onclick="startScan()">“Çæ</button>
+    <button onclick="startScan()">èª­å–</button>
     <div id="reader"></div>
     <div id="result"></div>
   </div>
@@ -25,21 +25,21 @@
         qrScanner = new Html5Qrcode("reader");
       }
       qrScanner.start(
-        { facingMode: "environment" }, // ”w–ÊƒJƒƒ‰
+        { facingMode: "environment" }, // èƒŒé¢ã‚«ãƒ¡ãƒ©
         { fps: 10, qrbox: 250 },
         onScanSuccess
       );
     }
 
     function onScanSuccess(decodedText) {
-      qrScanner.stop(); // “ÇæI—¹
-      document.getElementById("reader").innerHTML = ""; // ƒJƒƒ‰•\¦ƒNƒŠƒA
+      qrScanner.stop(); // èª­å–çµ‚äº†
+      document.getElementById("reader").innerHTML = ""; // ã‚«ãƒ¡ãƒ©è¡¨ç¤ºã‚¯ãƒªã‚¢
       showResult(decodedText);
     }
 
     function showResult(url) {
       const result = document.getElementById("result");
-      result.innerHTML = ""; // ‰Šú‰»
+      result.innerHTML = ""; // åˆæœŸåŒ–
       if (url.match(/\.(wav)$/i)) {
         result.innerHTML = `<audio controls autoplay src="${url}"></audio>`;
       } else if (url.match(/\.(jpg|png)$/i)) {
