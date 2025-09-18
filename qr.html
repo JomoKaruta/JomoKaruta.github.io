@@ -21,13 +21,9 @@
     let qrScanner;
 
     function startScan() {
-      // 既存スキャナがあれば終了＆クリア
-      if (qrScanner) {
-        qrScanner.clear().catch(() => {});
+      if (!qrScanner) {
+        qrScanner = new Html5Qrcode("reader");
       }
-      // 毎回新しくインスタンス化
-      qrScanner = new Html5Qrcode("reader");
-
       qrScanner.start(
         { facingMode: "environment" }, // 背面カメラ
         { fps: 10, qrbox: 250 },
@@ -36,15 +32,15 @@
     }
 
     function onScanSuccess(decodedText) {
-      qrScanner.stop().then(() => {
-        showResult(decodedText);
-      });
+      qrScanner.stop(); // 読取終了
+      document.getElementById("reader").innerHTML = ""; // カメラ表示クリア
+      showResult(decodedText);
     }
 
     function showResult(url) {
       const result = document.getElementById("result");
-      result.innerHTML = "";
-      if (url.match(/\.wav$/i)) {
+      result.innerHTML = ""; // 初期化
+      if (url.match(/\.(wav)$/i)) {
         result.innerHTML = `<audio controls autoplay src="${url}"></audio>`;
       } else if (url.match(/\.(jpg|png)$/i)) {
         result.innerHTML = `<img src="${url}" style="max-width:90%;">`;
