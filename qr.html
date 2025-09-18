@@ -8,7 +8,7 @@
     #reader { width: 300px; margin: 10px auto; }
     #result { margin-top: 20px; text-align: center; }
     button { padding: 10px 20px; margin: 5px; }
-    #closeBtn { display: none; } /* 初期は非表示 */
+    #closeBtn { display: none; }
   </style>
 </head>
 <body>
@@ -20,34 +20,40 @@
   </div>
 
   <script>
-    let qrScanner;
+    let qrScanner = null;
 
     function startScan() {
+      // 既存のスキャナがあれば停止＆削除
       if (qrScanner) {
-        qrScanner.clear().catch(() => {});
+        qrScanner.stop().then(() => qrScanner.clear()).catch(()=>{});
+        qrScanner = null;
+        document.getElementById("reader").innerHTML = "";
       }
+
+      // 新しいインスタンスを作る
       qrScanner = new Html5Qrcode("reader");
 
       qrScanner.start(
-        { facingMode: "environment" }, // 背面カメラ
+        { facingMode: "environment" },
         { fps: 10, qrbox: 250 },
         onScanSuccess
       );
 
-      document.getElementById("closeBtn").style.display = "inline-block"; // 閉じるボタン表示
+      document.getElementById("closeBtn").style.display = "inline-block";
     }
 
     function stopScan() {
       if (qrScanner) {
-        qrScanner.stop().then(() => {
+        qrScanner.stop().then(() => qrScanner.clear()).then(() => {
           document.getElementById("reader").innerHTML = "";
           document.getElementById("closeBtn").style.display = "none";
-        });
+          qrScanner = null; // 再生成できるようにリセット
+        }).catch(()=>{});
       }
     }
 
     function onScanSuccess(decodedText) {
-      stopScan(); // 読取成功時に停止＆閉じるボタンも消える
+      stopScan();
       showResult(decodedText);
     }
 
@@ -55,7 +61,6 @@
       const result = document.getElementById("result");
       result.innerHTML = "";
       if (url.match(/\.wav$/i)) {
-        // 裏で自動再生（UIなし）
         result.innerHTML = `<audio autoplay src="${url}"></audio>`;
       } else if (url.match(/\.(jpg|png)$/i)) {
         result.innerHTML = `<img src="${url}" style="max-width:90%;">`;
