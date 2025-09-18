@@ -1,53 +1,37 @@
-<!DOCTYPE html>
-<html lang="ja">
-<head>
-  <meta charset="UTF-8">
-  <title>QR読取サンプル</title>
-  <script src="https://unpkg.com/html5-qrcode"></script>
-  <style>
-    #reader { width: 300px; margin: 10px auto; }
-    #result { margin-top: 20px; text-align: center; }
-    button { padding: 10px 20px; }
-  </style>
-</head>
-<body>
-  <div style="text-align:center;">
-    <button onclick="startScan()">読取</button>
-    <div id="reader"></div>
-    <div id="result"></div>
-  </div>
+<script>
+  let qrScanner;
 
-  <script>
-    let qrScanner;
-
-    function startScan() {
-      if (!qrScanner) {
-        qrScanner = new Html5Qrcode("reader");
-      }
-      qrScanner.start(
-        { facingMode: "environment" }, // 背面カメラ
-        { fps: 10, qrbox: 250 },
-        onScanSuccess
-      );
+  function startScan() {
+    if (!qrScanner) {
+      qrScanner = new Html5Qrcode("reader");
+    } else {
+      // 既存のスキャナを一度クリア
+      qrScanner.clear().catch(() => {});
+      qrScanner = new Html5Qrcode("reader");
     }
 
-    function onScanSuccess(decodedText) {
-      qrScanner.stop(); // 読取終了
-      document.getElementById("reader").innerHTML = ""; // カメラ表示クリア
+    qrScanner.start(
+      { facingMode: "environment" },
+      { fps: 10, qrbox: 250 },
+      onScanSuccess
+    );
+  }
+
+  function onScanSuccess(decodedText) {
+    qrScanner.stop().then(() => {
       showResult(decodedText);
-    }
+    });
+  }
 
-    function showResult(url) {
-      const result = document.getElementById("result");
-      result.innerHTML = ""; // 初期化
-      if (url.match(/\.(wav)$/i)) {
-        result.innerHTML = `<audio controls autoplay src="${url}"></audio>`;
-      } else if (url.match(/\.(jpg|png)$/i)) {
-        result.innerHTML = `<img src="${url}" style="max-width:90%;">`;
-      } else {
-        result.innerHTML = `<a href="${url}" target="_blank">${url}</a>`;
-      }
+  function showResult(url) {
+    const result = document.getElementById("result");
+    result.innerHTML = "";
+    if (url.match(/\.(wav)$/i)) {
+      result.innerHTML = `<audio controls autoplay src="${url}"></audio>`;
+    } else if (url.match(/\.(jpg|png)$/i)) {
+      result.innerHTML = `<img src="${url}" style="max-width:90%;">`;
+    } else {
+      result.innerHTML = `<a href="${url}" target="_blank">${url}</a>`;
     }
-  </script>
-</body>
-</html>
+  }
+</script>
