@@ -22,10 +22,15 @@
   <script>
     let qrScanner = null;
 
-    function startScan() {
+    async function startScan() {
       // 既存のスキャナがあれば停止＆削除
       if (qrScanner) {
-        qrScanner.stop().then(() => qrScanner.clear()).catch(()=>{});
+        try {
+          await qrScanner.stop();
+          await qrScanner.clear();
+        } catch(e) {
+          console.warn("停止処理中にエラー", e);
+        }
         qrScanner = null;
         document.getElementById("reader").innerHTML = "";
       }
@@ -42,13 +47,17 @@
       document.getElementById("closeBtn").style.display = "inline-block";
     }
 
-    function stopScan() {
+    async function stopScan() {
       if (qrScanner) {
-        qrScanner.stop().then(() => qrScanner.clear()).then(() => {
-          document.getElementById("reader").innerHTML = "";
-          document.getElementById("closeBtn").style.display = "none";
-          qrScanner = null; // 再生成できるようにリセット
-        }).catch(()=>{});
+        try {
+          await qrScanner.stop();
+          await qrScanner.clear();
+        } catch(e) {
+          console.warn("停止処理中にエラー", e);
+        }
+        document.getElementById("reader").innerHTML = "";
+        document.getElementById("closeBtn").style.display = "none";
+        qrScanner = null;
       }
     }
 
